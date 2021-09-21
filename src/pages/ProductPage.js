@@ -1,8 +1,11 @@
-import React, { useEffect, useContext } from 'react';
+ /* eslint-disable */
+
+import React, { useEffect, useContext, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { ShopContext } from '../context/shopContext';
-import { Text, Div, Button, Row, Col, Container } from 'atomize';
+import { Text, Div, Button, Row, Col, Container, Dropdown, Anchor , Tag} from 'atomize';
 function ProductPage() {
+	const [showDropdown, setShowDropdown] = useState(false);
 	let { id } = useParams();
 	const { fetchProductWithId, addItemToCheckout, product, openCart } = useContext(ShopContext);
 
@@ -15,6 +18,23 @@ function ProductPage() {
 		};
 	}, [fetchProductWithId, id]);
 	if (!product.title) return <div>loading</div>;
+
+		const colors = [
+		<div>	{product.options[0].values[0].value}</div>,
+		<div>	{product.options[0].values[1].value}</div>
+
+			
+		]
+
+	const menuList = (
+		<Div>
+		  {colors.map((name, index) => (
+			<Anchor d="block" p={{ y: "0.25rem" }}>
+			  {name}
+			</Anchor>
+		  ))}
+		</Div>
+	  );
 	return (
 		<Container p="2rem">
 			<Row>
@@ -31,23 +51,35 @@ function ProductPage() {
 					<Text tag="p" textSize="paragraph" textColor="gray900" textWeight="200">
 						{product.description}
 					</Text>
-                    <Text tag="p" textSize="paragraph" textColor="black" textWeight="400">
+
+
+					<Dropdown
+						m={{ r: "1rem", b: "1rem" , t: "1.5rem"}}
+						isOpen={showDropdown}
+						onClick={() => setShowDropdown(!showDropdown)}
+						menu={menuList}
+					>
 						{product.options[0].name}
+					</Dropdown>
+					<Text tag="p" m={{r:"1rem"}} textSize="paragraph" textColor="black900" textWeight="400">
+						{product.options[1].name}
 					</Text>
-                    <Text tag="p" textSize="paragraph" textColor="black" textWeight="800">
-						{product.options[0].values[0].value}
-                        Or
-					</Text>
+					{
+						product.options[1].values.map((e) => {
+							return(
+								<Tag m={{ r: "1.1rem", b: "1rem" , t: "0.5rem"}}  cursor="pointer" >{e.value}</Tag>		
+							)
+						})
+					}
 					<Button
 						rounded="0"
 						shadow="3"
 						bg="black500"
 						m={{ y: '2rem' }}
 						onClick={() => {
-                        addItemToCheckout(product.variants[0].id, 1)
-                        openCart()
-                        
-                        }}
+							addItemToCheckout(product.variants[0].id, 1);
+							openCart();
+						}}
 					>
 						Add To Cart
 					</Button>
